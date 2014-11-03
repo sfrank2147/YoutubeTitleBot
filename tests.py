@@ -2,12 +2,12 @@ import unittest  # @UnresolvedImport
 from youtube import YoutubePage, youtube_url
 
 class YoutubeTest(unittest.TestCase):
-    # def setUp(self):
-    #     self.youtube_page = YoutubePage('https://www.youtube.com/watch?v=fvxqnQmahTA')
+    def setUp(self):
+        self.youtube_page = YoutubePage('https://www.youtube.com/watch?v=fu7D0KKmZGM')
         
-    # def test_parsing(self):
-    #     self.assertEqual(self.youtube_page.title,u'Minions - Banana Song (Full Song)')
-    #     self.assertEqual(self.youtube_page.description,u'The "Banana Song" taken from the amazing new upcoming movie "Despicable Me 2".')
+    def test_parsing(self):
+        self.assertEqual(self.youtube_page.title,u'Tiny Hamster in a Tiny Playground')
+        self.assertEqual(self.youtube_page.description,u"My tiny dwarf hamster is back again. This time Chicken (yup, that's her name) is exploring her handmade playground. Watch her slide, swing and play. Thanks D...")
 
     def test_youtube_url(self):
         self.assertEqual(youtube_url('www.youtube.com/watch?v=asdfads'), 'http://www.youtube.com/watch?v=asdfads')
