@@ -3,6 +3,9 @@ import config
 from pprint import pprint
 import pdb
 from youtube import YoutubePage, youtube_url
+from praw.errors import RateLimitExceeded
+from urllib2 import HTTPError
+import sys
 
 num_requests = 0
 
@@ -30,7 +33,19 @@ def print_youtube_info(comment):
     :param comment: a praw.objects.Comment object 
     """
     global num_requests
+
+    #we do not want to reply to our own youtube videos, we'd end up with
+    #an endless list of replies
     if not hasattr(comment, 'body'):
+        return
+    if not comment.author:
+        print "No author for comment"
+        return
+    if not comment.author.name:
+        print "No name for author"
+        return
+    if(comment.author.name.lower() == config.USERNAME.lower()):
+        print "Don't want to reply to myself."
         return
     y_url = youtube_url(comment.body)
     if y_url:
@@ -48,8 +63,15 @@ def print_youtube_info(comment):
                 #record that we've posted the info
                 record_replied(comment.id)
                 print "Replied to comment!"
-            except RateLimitExceeded:
+            except (RateLimitExceeded, HTTPError):
                 print "Oops - posted too often."
+                sys.exit()
+            except Exception, e:
+                print "Unknown exception"
+                print e
+        else:
+            print "I did enough commenting for now."
+            sys.exit()
 
 def make_reply(youtube_page):
     return (u"Youtube link: {}\n\n"
@@ -75,7 +97,7 @@ def main():
     r.login(config.USERNAME, config.PASSWORD)
 
     #just messing around for now
-    submissions = r.get_subreddit(config.SUBREDDITS).get_hot(limit=10)
+    submissions = r.get_subreddit(config.SUBREDDITS).get_hot(limit=1000)
     num_requests += 2
     for submission in submissions:
         comments = submission.comments
